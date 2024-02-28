@@ -50,7 +50,7 @@ html {
   margin-right: 1rem; /* 右側のマージンを設定 */
 }
 
-/* 'Ask'ボタンのスタイリング */
+/* 'Send'ボタンのスタイリング */
 .send-button {
   padding: 0.5rem 1rem; /* 内側の余白を設定 */
   background: #5d5c61; /* 背景色を設定 */
@@ -60,9 +60,14 @@ html {
   cursor: pointer; /* カーソルをポインターに設定 */
 }
 
-/* 'Ask'ボタンをホバーした際のスタイル変更 */
+/* 'Send'ボタンをホバーした際のスタイル変更 */
 .send-button:hover {
   background: #424242; /* ホバー時の背景色を暗く */
+}
+
+/* 'Send'ボタンをホバーした際のスタイル変更 */
+.send-button:disabled {
+  background: #686767; /* 非活性時の背景色を明るく */
 }
 
 /* sectionのスクロール設定 */
