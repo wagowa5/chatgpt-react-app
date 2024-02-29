@@ -1,6 +1,7 @@
-# react-study
+# chatgpt-react-app
 Reactの勉強
-ChatGPTアプリを作る
+
+ChatGPTアプリを作ってみる
 
 # 成果物
 https://d1vqxzlly8xhg7.cloudfront.net/
