@@ -10,8 +10,8 @@ function App() {
 
   // websocket接続状態を保持するstate、1つでもtrueのときSendボタンを無効化する
   const [, setWsConnect] = useState([]);
-
   const [ws, setWs] = useState(null);
+  const WSS_URL = import.meta.env.VITE_CHAT_STREAM_URL
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -32,7 +32,7 @@ function App() {
 
   useEffect(() => {
     // WebSocket接続を開始
-    const ws = new WebSocket('wss://zmzdbywisc.execute-api.ap-northeast-1.amazonaws.com/chat_stream/');
+    const ws = new WebSocket(WSS_URL);
     setWs(ws);
 
     ws.onopen = () => console.log('WebSocket Connected');
