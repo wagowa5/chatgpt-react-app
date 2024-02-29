@@ -7,7 +7,6 @@ ChatGPTアプリを作ってみる
 https://d1vqxzlly8xhg7.cloudfront.net/
 
 # 構成図
-
 ![構成図](ChatGPTApp構成図.png)
 
 # 参考
