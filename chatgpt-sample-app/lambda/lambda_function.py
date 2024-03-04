@@ -17,7 +17,7 @@ def lambda_handler(event, context):
     stage = event.get('requestContext', {}).get('stage')
     connectionId = event.get('requestContext', {}).get('connectionId')
     apigw_management = boto3.client(
-        'apigatewaymanagementapi', endpoint_url=F"https://zmzdbywisc.execute-api.ap-northeast-1.amazonaws.com/chat_stream"
+        'apigatewaymanagementapi', endpoint_url=F"https://YOUR API GATEWAY URL"
     )
 
     # Request ChatGPT API
