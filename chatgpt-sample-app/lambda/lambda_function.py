@@ -35,7 +35,18 @@ def lambda_handler(event, context):
         if content:
             apigw_management.post_to_connection(
                 ConnectionId=connectionId,
-                Data=content
+                Data=json.dumps({
+                    "chunk": content,
+                    "isStopped": False
+                })
+            )
+        if partial_message.choices[0].finish_reason == "stop":
+            apigw_management.post_to_connection(
+                ConnectionId=connectionId,
+                Data=json.dumps({
+                    "chunk": "None",
+                    "isStopped": True
+                })
             )
 
     return {
