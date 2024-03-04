@@ -17,7 +17,7 @@ def lambda_handler(event, context):
     stage = event.get('requestContext', {}).get('stage')
     connectionId = event.get('requestContext', {}).get('connectionId')
     apigw_management = boto3.client(
-        'apigatewaymanagementapi', endpoint_url=F"https://YOUR API GATEWAY URL"
+        'apigatewaymanagementapi', endpoint_url=F"https://zmzdbywisc.execute-api.ap-northeast-1.amazonaws.com/chat_stream"
     )
 
     # Request ChatGPT API
@@ -35,7 +35,18 @@ def lambda_handler(event, context):
         if content:
             apigw_management.post_to_connection(
                 ConnectionId=connectionId,
-                Data=content
+                Data=json.dumps({
+                    "chunk": content,
+                    "isStopped": False
+                })
+            )
+        if partial_message.choices[0].finish_reason == "stop":
+            apigw_management.post_to_connection(
+                ConnectionId=connectionId,
+                Data=json.dumps({
+                    "chunk": "None",
+                    "isStopped": True
+                })
             )
 
     return {
