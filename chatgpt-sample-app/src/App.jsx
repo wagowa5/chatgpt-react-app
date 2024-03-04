@@ -8,27 +8,8 @@ function App() {
   const [messages, setMessages] = useState([[]]);
   const [canSend, setCanSend] = useState(true);
 
-  // websocket接続状態を保持するstate、1つでもtrueのときSendボタンを無効化する
-  const [, setWsConnect] = useState([]);
   const [ws, setWs] = useState(null);
   const WSS_URL = import.meta.env.VITE_CHAT_STREAM_URL
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      // 定期的にWebSocket接続状態をfalseに更新
-      setWsConnect(prevWsConnect => {
-        let newWsConnect = [false, ...prevWsConnect.slice(0, 9)]; // 最初の10要素だけを保持、先頭にfalseを追加
-        // WebSocket接続がすべてfalseのときSendボタンを有効化
-        const allFalse = newWsConnect.every(connect => connect === false);
-        setCanSend(allFalse);
-        return newWsConnect;
-      });
-    }, 150); // 150ミリ秒ごとに実行
-  
-    return () => {
-      clearInterval(intervalId); // コンポーネントのアンマウント時にクリア
-    };
-  }, []); // 空の依存配列で一度だけ実行
 
   useEffect(() => {
     // WebSocket接続を開始
@@ -38,27 +19,34 @@ function App() {
     ws.onopen = () => console.log('WebSocket Connected');
     ws.onclose = () => console.log('WebSocket Disconnected');
     ws.onmessage = (event) => {
-      // メッセージ受信時にWebSocket接続状態をtrueに更新
-      setWsConnect(prevWsConnect => {
-        prevWsConnect.unshift(true);
-        return [...prevWsConnect];
-      });
+      /**
+       * メッセージの形式:
+       *  {
+       *    "chunk": string,
+       *    "isStopped": boolean
+       *  }
+       */
+      const response = JSON.parse(event.data);
 
-      const response = event.data; // 受け取ったチャンク
-      setMessages(prevMessages => {
-        // 最後のメッセージが現在のプロンプトに対応するか確認
-        const lastMessageIndex = prevMessages.length - 1;
-        // 既存のレスポンスに新しいチャンクを追加
-        const updatedLastMessage = [
-          prevMessages[lastMessageIndex][0],
-          (prevMessages[lastMessageIndex][1] || '') + response
-        ];
-        return [
-          ...prevMessages.slice(0, lastMessageIndex),
-          updatedLastMessage
-        ];
-      });
-      console.log('WebSocket Message:', response);
+      if(!response.isStopped) {
+        setCanSend(false);
+        setMessages(prevMessages => {
+          // 最後のメッセージが現在のプロンプトに対応するか確認
+          const lastMessageIndex = prevMessages.length - 1;
+          // 既存のレスポンスに新しいチャンクを追加
+          const updatedLastMessage = [
+            prevMessages[lastMessageIndex][0],
+            (prevMessages[lastMessageIndex][1] || '') + response.chunk
+          ];
+          return [
+            ...prevMessages.slice(0, lastMessageIndex),
+            updatedLastMessage
+          ];
+        });
+        console.log('WebSocket Message:', response);
+      } else {
+        setCanSend(true);
+      }
     };
     ws.onerror = (error) => console.error('WebSocket Error:', error);
 
@@ -68,11 +56,6 @@ function App() {
 
   const handlePrompt = () => {
     if (ws && ws.readyState === WebSocket.OPEN) {
-      // メッセージ送信時にWebSocket接続状態をtrueに更新
-      setWsConnect(prevWsConnect => {
-        prevWsConnect.unshift(true);
-        return [...prevWsConnect];
-      });
       // 送信後に再送信を防ぐために送信ボタンを無効化
       setCanSend(false);
 
